@@ -1,0 +1,16 @@
+# Ignore node dependencies
+backend/node_modules/
+giulio/node_modules/
+
+# Ignore local env files
+backend/.env
+giulio/.env
+.env
+
+# Ignore build output
+backend/dist/
+giulio/dist/
+
+# OS files
+.DS_Store
+Thumbs.db

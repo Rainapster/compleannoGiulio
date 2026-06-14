@@ -1,0 +1,10 @@
+.backgroundList {
+  background-color: rgba(0, 0, 0, 0.418);
+  --bs-gutter-x: 0rem;
+}
+@media (max-width: 991px) {
+  .backgroundList {
+    background-color: rgb(63, 92, 110);
+    --bs-gutter-x: 0rem;
+  }
+}
