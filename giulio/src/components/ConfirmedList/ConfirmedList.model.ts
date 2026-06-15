@@ -6,6 +6,5 @@ export interface ParticipantItem {
 
 export interface ConfirmedListProps {
   confirmedList: ParticipantItem[];
-  ownedParticipantIds: string[];
   onDelete: (id: string) => void;
 }

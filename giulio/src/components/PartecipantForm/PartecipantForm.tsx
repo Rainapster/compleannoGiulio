@@ -3,19 +3,12 @@ import type { PartecipantFormProps } from "./PartecipantFort.model";
 import "./PartecipantForm.css";
 
 const PartecipantForm = ({ handlePartecipants }: PartecipantFormProps) => {
-//   const onSubmit1 = (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     handlePartecipants(e.currentTarget.name, e.currentTarget.surname);
-//   };
-
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
-  const [, setError] = useState<string | null>(null);
-  const [, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
@@ -27,45 +20,29 @@ const PartecipantForm = ({ handlePartecipants }: PartecipantFormProps) => {
       return;
     }
 
+    setSaving(true);
+
     try {
-      setSaving(true);
+      const newParticipant = {
+        id:
+          typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: trimmedName,
+        surname: trimmedSurname,
+      };
 
-      const response = await fetch(`${apiBaseUrl}/api/participants`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: trimmedName,
-          surname: trimmedSurname,
-        }),
-      });
-
-      if (!response.ok) {
-        const body = await response.json();
-        throw new Error(body?.message ?? "Errore invio dati");
-      }
-
-      const participant = await response.json();
-      handlePartecipants({
-        id: participant._id,
-        name: participant.name,
-        surname: participant.surname,
-        deletionToken: participant.deletionToken,
-      });
-
+      handlePartecipants(newParticipant);
       setName("");
       setSurname("");
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Errore durante l'invio al server",
+        err instanceof Error ? err.message : "Errore durante la creazione del partecipante",
       );
     } finally {
       setSaving(false);
     }
   };
-//   const onSubmit2 = (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     handlePartecipants(name.trim(), surname.trim());
-//   };
 
   return (
     <div className="my-4 d-flex flex-column justify-content-center align-items-center">
@@ -96,7 +73,10 @@ const PartecipantForm = ({ handlePartecipants }: PartecipantFormProps) => {
             required
           />
         </div>
-        <button type="submit">Conferma</button>
+        {error ? <p className="text-danger">{error}</p> : null}
+        <button type="submit" disabled={saving}>
+          {saving ? "Salvataggio..." : "Conferma"}
+        </button>
       </form>
     </div>
   );

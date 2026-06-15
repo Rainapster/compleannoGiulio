@@ -1,3 +1,5 @@
+import type { ParticipantItem } from "../ConfirmedList/ConfirmedList.model";
+
 export interface PartecipantFormProps {
-  handlePartecipants: (participant: { id: string; name: string; surname: string; deletionToken: string }) => void;
+  handlePartecipants: (participant: ParticipantItem) => void;
 }

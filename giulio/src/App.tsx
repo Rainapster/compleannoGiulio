@@ -6,93 +6,33 @@ import ConfirmedList from "./components/ConfirmedList/ConfirmedList";
 import type { ParticipantItem } from "./components/ConfirmedList/ConfirmedList.model";
 
 function App() {
-  const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
   const [partecipants, setPartecipants] = useState<ParticipantItem[]>([]);
-  const [ownedParticipantTokens, setOwnedParticipantTokens] = useState<
-    Record<string, string>
-  >({});
 
   useEffect(() => {
-    const loadParticipants = async () => {
+    const savedParticipants = localStorage.getItem("participants");
+    if (savedParticipants) {
       try {
-        const response = await fetch(`${apiBaseUrl}/api/participants`);
-        if (!response.ok) {
-          throw new Error("Impossibile caricare i partecipanti");
-        }
-
-        const data = await response.json();
-        const loadedParticipants = data.map(
-          (item: { _id: string; name: string; surname: string }) => ({
-            id: item._id,
-            name: item.name,
-            surname: item.surname,
-          }),
-        );
-
-        setPartecipants(loadedParticipants);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const savedOwnedTokens = localStorage.getItem("ownedParticipantTokens");
-    if (savedOwnedTokens) {
-      try {
-        setOwnedParticipantTokens(JSON.parse(savedOwnedTokens));
+        setPartecipants(JSON.parse(savedParticipants));
       } catch {
-        localStorage.removeItem("ownedParticipantTokens");
+        localStorage.removeItem("participants");
       }
     }
-
-    loadParticipants();
   }, []);
 
-  const storeOwnedTokens = (tokens: Record<string, string>) => {
-    setOwnedParticipantTokens(tokens);
-    localStorage.setItem("ownedParticipantTokens", JSON.stringify(tokens));
-  };
-
-  const handlePartecipants = (
-    participant: ParticipantItem & { deletionToken: string },
-  ) => {
-    setPartecipants((prev) => [participant, ...prev]);
-    storeOwnedTokens({
-      ...ownedParticipantTokens,
-      [participant.id]: participant.deletionToken,
+  const handlePartecipants = (participant: ParticipantItem) => {
+    setPartecipants((prev) => {
+      const nextParticipants = [participant, ...prev];
+      localStorage.setItem("participants", JSON.stringify(nextParticipants));
+      return nextParticipants;
     });
   };
 
-  const handleDelete = async (id: string) => {
-    const token = ownedParticipantTokens[id];
-    if (!token) {
-      console.error(
-        "Token di cancellazione mancante o non autorizzato per questo partecipante",
-      );
-      return;
-    }
-
-    try {
-      const response = await fetch(`${apiBaseUrl}/api/participants/${id}`, {
-        method: "DELETE",
-        headers: {
-          "x-delete-token": token,
-        },
-      });
-
-      if (!response.ok) {
-        const body = await response.json();
-        throw new Error(body?.message ?? "Errore durante la cancellazione");
-      }
-
-      setPartecipants((prev) =>
-        prev.filter((participant) => participant.id !== id),
-      );
-      const nextTokens = { ...ownedParticipantTokens };
-      delete nextTokens[id];
-      storeOwnedTokens(nextTokens);
-    } catch (error) {
-      console.error(error);
-    }
+  const handleDelete = (id: string) => {
+    setPartecipants((prev) => {
+      const nextParticipants = prev.filter((participant) => participant.id !== id);
+      localStorage.setItem("participants", JSON.stringify(nextParticipants));
+      return nextParticipants;
+    });
   };
 
   return (
@@ -113,7 +53,6 @@ function App() {
             <div className="list-panel">
               <ConfirmedList
                 confirmedList={partecipants}
-                ownedParticipantIds={Object.keys(ownedParticipantTokens)}
                 onDelete={handleDelete}
               />
             </div>
