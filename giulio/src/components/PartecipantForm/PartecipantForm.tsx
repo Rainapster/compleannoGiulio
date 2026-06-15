@@ -10,8 +10,8 @@ const PartecipantForm = ({ handlePartecipants }: PartecipantFormProps) => {
 
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [, setError] = useState<string | null>(null);
+  const [, setSaving] = useState(false);
 
   const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
