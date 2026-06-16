@@ -9,13 +9,13 @@ const ConfirmedList = ({ confirmedList, onDelete }: ConfirmedListProps) => {
         confirmedList.map((participant) => (
           <div key={participant.id} className="d-flex align-items-center justify-content-between mb-2">
             <span>{participant.name} {participant.surname}</span>
-            <button
+            {/* <button
               type="button"
               className="btn btn-sm btn-danger"
               onClick={() => onDelete(participant.id)}
             >
               Elimina
-            </button>
+            </button> */}
           </div>
         ))
       ) : (

@@ -6,6 +6,12 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  
+}
+@media (max-width: 768px) {
+  .page-background {
+    background-position: top center;
+  }
 }
 
 .list-panel {
