@@ -34,19 +34,21 @@ function App() {
     loadParticipants();
   }, []);
 
-  const handlePartecipants = async (participant: ParticipantItem) => {
-    const { error: insertError } = await supabase
-      .from("participants")
-      .insert([participant]);
+const handlePartecipants = async (participant: ParticipantItem) => {
+  const result = await supabase
+    .from("participants")
+    .insert([participant]);
 
-    if (insertError) {
-      console.error(insertError);
-      setError("Errore durante il salvataggio del partecipante");
-      return;
-    }
+  console.log("INSERT RESULT:", result);
 
-    setPartecipants((prev) => [participant, ...prev]);
-  };
+  if (result.error) {
+    console.error("INSERT ERROR:", result.error);
+    setError("Errore durante il salvataggio del partecipante");
+    return;
+  }
+
+  setPartecipants((prev) => [participant, ...prev]);
+};
 
   const handleDelete = async (id: string) => {
     const { error: deleteError } = await supabase
