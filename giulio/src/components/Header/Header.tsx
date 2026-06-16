@@ -1,7 +1,8 @@
+import "./Header.css";
 const Header = () => {
   return (
     <div className="header">
-      <h1>Il compleanno di Giulio</h1>
+      <h1 style={{ color: "white" }}>Il compleanno di Giulio</h1>
       <img className="rounded-50 giulio-image" src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExb2RoZmFjYWRvYzllMnJxNnI4bmxna3g3aXBtcDA5bHFhZnVkdmVxcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/11vVUnbjUONl3q/giphy.gif" alt="Giulio" />
       <p className="m-5">
         Giulio compie 2 anni! Siamo felici di invitarvi a festeggiare insieme
