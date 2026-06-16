@@ -50,20 +50,6 @@ const handlePartecipants = async (participant: ParticipantItem) => {
   setPartecipants((prev) => [participant, ...prev]);
 };
 
-  const handleDelete = async (id: string) => {
-    const { error: deleteError } = await supabase
-      .from("participants")
-      .delete()
-      .eq("id", id);
-
-    if (deleteError) {
-      console.error(deleteError);
-      setError("Errore durante l'eliminazione del partecipante");
-      return;
-    }
-
-    setPartecipants((prev) => prev.filter((participant) => participant.id !== id));
-  };
 
   return (
     <div className="page-background">
@@ -85,7 +71,6 @@ const handlePartecipants = async (participant: ParticipantItem) => {
             <div className="list-panel">
               <ConfirmedList
                 confirmedList={partecipants}
-                onDelete={handleDelete}
               />
             </div>
           </div>
