@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import { supabase } from "./lib/supabaseClient";
 import PartecipantForm from "./components/PartecipantForm/PartecipantForm";
 import Header from "./components/Header/Header";
 import ConfirmedList from "./components/ConfirmedList/ConfirmedList";
@@ -7,32 +8,59 @@ import type { ParticipantItem } from "./components/ConfirmedList/ConfirmedList.m
 
 function App() {
   const [partecipants, setPartecipants] = useState<ParticipantItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedParticipants = localStorage.getItem("participants");
-    if (savedParticipants) {
-      try {
-        setPartecipants(JSON.parse(savedParticipants));
-      } catch {
-        localStorage.removeItem("participants");
+    const loadParticipants = async () => {
+      setLoading(true);
+      const { data, error: fetchError } = await supabase
+        .from("participants")
+        .select("id, name, surname")
+        .order("created_at", { ascending: false });
+
+      if (fetchError) {
+        console.error(fetchError);
+        setError("Errore nel caricamento dei partecipanti");
+        setLoading(false);
+        return;
       }
-    }
+
+      const participantsData = data as ParticipantItem[] | null;
+      setPartecipants(participantsData ?? []);
+      setLoading(false);
+    };
+
+    loadParticipants();
   }, []);
 
-  const handlePartecipants = (participant: ParticipantItem) => {
-    setPartecipants((prev) => {
-      const nextParticipants = [participant, ...prev];
-      localStorage.setItem("participants", JSON.stringify(nextParticipants));
-      return nextParticipants;
-    });
+  const handlePartecipants = async (participant: ParticipantItem) => {
+    const { error: insertError } = await supabase
+      .from("participants")
+      .insert([participant]);
+
+    if (insertError) {
+      console.error(insertError);
+      setError("Errore durante il salvataggio del partecipante");
+      return;
+    }
+
+    setPartecipants((prev) => [participant, ...prev]);
   };
 
-  const handleDelete = (id: string) => {
-    setPartecipants((prev) => {
-      const nextParticipants = prev.filter((participant) => participant.id !== id);
-      localStorage.setItem("participants", JSON.stringify(nextParticipants));
-      return nextParticipants;
-    });
+  const handleDelete = async (id: string) => {
+    const { error: deleteError } = await supabase
+      .from("participants")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      console.error(deleteError);
+      setError("Errore durante l'eliminazione del partecipante");
+      return;
+    }
+
+    setPartecipants((prev) => prev.filter((participant) => participant.id !== id));
   };
 
   return (
@@ -46,6 +74,8 @@ function App() {
               </div>
 
               <PartecipantForm handlePartecipants={handlePartecipants} />
+              {loading && <p className="text-center">Caricamento partecipanti...</p>}
+              {error && <p className="text-danger text-center">{error}</p>}
             </div>
           </div>
 

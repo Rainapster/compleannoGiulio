@@ -8,7 +8,7 @@ const PartecipantForm = ({ handlePartecipants }: PartecipantFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
@@ -32,7 +32,7 @@ const PartecipantForm = ({ handlePartecipants }: PartecipantFormProps) => {
         surname: trimmedSurname,
       };
 
-      handlePartecipants(newParticipant);
+      await handlePartecipants(newParticipant);
       setName("");
       setSurname("");
     } catch (err) {
